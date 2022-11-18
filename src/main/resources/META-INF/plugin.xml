@@ -5,17 +5,16 @@
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Bitbucket-coverage-sending-plugin</name>
+    <name>Bitbucket Server Coverage API Call Extension</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="support@yourcompany.com" url="https://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="tasktas9@gmail.com" url="https://t45k.github.io">T45K</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    This plugin will integrate your test coverage result and Bitbucket Server coverage API.
   ]]></description>
 
     <!-- Product and plugin compatibility requirements.
@@ -27,4 +26,11 @@
     <extensions defaultExtensionNs="com.intellij">
 
     </extensions>
+
+    <actions>
+        <action class="io.github.t45k.bitbucket_coverage.Action"
+                text="Run and Send Coverage Result">
+            <add-to-group group-id="RunContextGroupMore"/>
+        </action>
+    </actions>
 </idea-plugin>
