@@ -28,8 +28,8 @@
     </extensions>
 
     <actions>
-        <action class="io.github.t45k.bitbucket_coverage.Action"
-                text="Run and Send Coverage Result">
+        <action class="io.github.t45k.bitbucket_coverage.CoveragePostAction"
+                text="Run and Post Coverage Result">
             <add-to-group group-id="RunContextGroupMore"/>
         </action>
     </actions>
