@@ -29,7 +29,7 @@
 
     <actions>
         <action class="io.github.t45k.bitbucket_coverage.CoveragePostAction"
-                text="Run and Send Coverage Result">
+                text="Post Coverage Result to Bitbucket Server">
             <add-to-group group-id="RunContextGroupMore"/>
         </action>
     </actions>
