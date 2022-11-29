@@ -28,9 +28,12 @@
     </extensions>
 
     <actions>
-        <action class="io.github.t45k.bitbucket_coverage.Action"
+        <action class="io.github.t45k.bitbucket_coverage.CoveragePostAction"
                 text="Run and Send Coverage Result">
             <add-to-group group-id="RunContextGroupMore"/>
         </action>
     </actions>
+
+    <depends>com.intellij.modules.java</depends>
+    <depends>Git4Idea</depends>
 </idea-plugin>
