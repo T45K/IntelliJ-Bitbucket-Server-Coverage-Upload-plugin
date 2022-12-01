@@ -16,17 +16,18 @@ import io.github.t45k.bitbucket_coverage.model.Inner
 import io.github.t45k.bitbucket_coverage.model.IntermediateFileCoverage
 import io.github.t45k.bitbucket_coverage.model.RequestBody
 import kotlin.io.path.Path
-import okhttp3.Credentials
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpRequest.BodyPublishers
+import java.net.http.HttpResponse.BodyHandlers
+import java.nio.charset.StandardCharsets
+import java.util.Base64
 import java.util.StringJoiner
 
 class CoveragePostAction : AnAction() {
 
-    private val okHttpClient = OkHttpClient()
+    private val httpClient = HttpClient.newHttpClient();
     private val objectMapper = jacksonObjectMapper()
 
     companion object {
@@ -69,13 +70,7 @@ class CoveragePostAction : AnAction() {
             }
 
             for ((repo, fileCoverages) in repositoryFileCoverageMap) {
-                val url = BITBUCKET_URL.toHttpUrl().newBuilder()
-                    .addPathSegment("rest")
-                    .addPathSegment("code-coverage")
-                    .addPathSegment("1.0")
-                    .addPathSegment("commits")
-                    .addPathSegment(repo.currentRevision!!)
-                    .build()
+                val uri = URI.create("$BITBUCKET_URL/rest/code-coverage/1.0/commits/${repo.currentRevision!!}")
                 val body = fileCoverages.filter { it.lines.isNotEmpty() }
                     .map { fileCoverage ->
                         val coveredLines = fileCoverage.lines.groupBy({ it.hits > 0 }, { it.lineNumber })
@@ -84,16 +79,18 @@ class CoveragePostAction : AnAction() {
                         coveredLines[false]?.also { joiner.add("U:${it.joinToString(",")}") }
                         Inner(fileCoverage.relativePath, joiner.toString())
                     }.let(::RequestBody)
-                val request = Request.Builder()
-                    .url(url)
-                    .addHeader("authorization", Credentials.basic(USERNAME, PASSWORD))
-                    .addHeader("X-Atlassian-Token", "no-check")
-                    .post(objectMapper.writeValueAsString(body).toRequestBody("application/json".toMediaType()))
+                val request = HttpRequest.newBuilder()
+                    .uri(uri)
+                    .header(
+                        "authorization",
+                        Base64.getEncoder().encodeToString("Basic ${USERNAME}:${PASSWORD}".toByteArray())
+                    ).header("X-Atlassian-Token", "no-check")
+                    .header("content-type", "application/json")
+                    .POST(BodyPublishers.ofString(objectMapper.writeValueAsString(body)))
                     .build()
-                okHttpClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
-                        logger.error("Communication failure for the following reason.\n${response.body.string()}")
-                    }
+                val response = httpClient.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8))
+                if (response.statusCode() >= 400) {
+                    logger.error(response.body())
                 }
                 // TODO: show dialog
             }

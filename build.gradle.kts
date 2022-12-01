@@ -18,14 +18,6 @@ intellij {
     type.set("IC") // Target IDE Platform
 
     plugins.set(listOf("com.intellij.java", "git4idea"))
-
-    dependencies {
-        implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.10")
-    }
-}
-
-dependencies {
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.10")
 }
 
 tasks {
