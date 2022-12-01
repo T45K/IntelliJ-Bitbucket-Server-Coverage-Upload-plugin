@@ -4,8 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.intellij.coverage.CoverageDataManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.vcs.changes.ChangeListManagerImpl
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.rt.coverage.data.LineData
@@ -17,7 +17,7 @@ import io.github.t45k.bitbucket_coverage.model.IntermediateFileCoverage
 import io.github.t45k.bitbucket_coverage.model.RequestBody
 import kotlin.io.path.Path
 import okhttp3.Credentials
-import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -37,17 +37,13 @@ class CoveragePostAction : AnAction() {
     }
 
     override fun actionPerformed(e: AnActionEvent) {
-        ApplicationManager.getApplication().runReadAction() {
-//        val dataContext = e.dataContext
-            val project = e.project ?: return@runReadAction// TODO: show message
+        val project = e.project ?: return // TODO: show message
+        ChangeListManagerImpl.getInstanceImpl(project).executeOnUpdaterThread {
             val gitRepositoryManager = GitRepositoryManager.getInstance(project)
-//        val moduleManager = ModuleManager.getInstance(project)
-//        val projectFileIndex = ProjectFileIndex.getInstance(project)
             val coverageDataManager = CoverageDataManager.getInstance(project)
             val currentSuite = coverageDataManager.currentSuitesBundle
-//        val coverageEngine = currentSuite.coverageEngine
-            val projectData =
-                currentSuite.suites[0].getCoverageData(coverageDataManager) ?: return@runReadAction// TODO: show message
+            val projectData = currentSuite.suites[0].getCoverageData(coverageDataManager)
+                ?: return@executeOnUpdaterThread // TODO: show message
             val classes = projectData.classesCollection
             val scope = GlobalSearchScope.everythingScope(project)
             val javaPsiFacade = JavaPsiFacade.getInstance(project)
@@ -69,13 +65,11 @@ class CoveragePostAction : AnAction() {
                     FileCoverage(repoRoot.relativize(filePath).toString(), it.second.lines)
                 })
             if (repositoryFileCoverageMap.isEmpty()) {
-                return@runReadAction// TODO: show message
+                return@executeOnUpdaterThread // TODO: show message
             }
 
             for ((repo, fileCoverages) in repositoryFileCoverageMap) {
-                val url = HttpUrl.Builder()
-                    .scheme("https")
-                    .host(BITBUCKET_URL)
+                val url = BITBUCKET_URL.toHttpUrl().newBuilder()
                     .addPathSegment("rest")
                     .addPathSegment("code-coverage")
                     .addPathSegment("1.0")
@@ -86,12 +80,8 @@ class CoveragePostAction : AnAction() {
                     .map { fileCoverage ->
                         val coveredLines = fileCoverage.lines.groupBy({ it.hits > 0 }, { it.lineNumber })
                         val joiner = StringJoiner(";")
-                        if (coveredLines[true]?.isNotEmpty() == true) {
-                            joiner.add("C:${coveredLines[true]!!.joinToString(",")}")
-                        }
-                        if (coveredLines[false]?.isNotEmpty() == true) {
-                            joiner.add("U:${coveredLines[false]!!.joinToString(",")}")
-                        }
+                        coveredLines[true]?.also { joiner.add("C:${it.joinToString(",")}") }
+                        coveredLines[false]?.also { joiner.add("U:${it.joinToString(",")}") }
                         Inner(fileCoverage.relativePath, joiner.toString())
                     }.let(::RequestBody)
                 val request = Request.Builder()
@@ -100,18 +90,15 @@ class CoveragePostAction : AnAction() {
                     .addHeader("X-Atlassian-Token", "no-check")
                     .post(objectMapper.writeValueAsString(body).toRequestBody("application/json".toMediaType()))
                     .build()
-                okHttpClient.newCall(request).execute().close() // TODO: error handling
+                okHttpClient.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        logger.error("Communication failure for the following reason.\n${response.body.string()}")
+                    }
+                }
+                // TODO: show dialog
             }
         }
-//        val dialog = coverageEngine.createGenerateReportDialog(project, dataContext, currentSuite)
-//        dialog.reset()
-//        if (!dialog.showAndGet()) {
-//            return
-//        }
-//        dialog.apply()
-//        coverageEngine.generateReport(project, dataContext, currentSuite)
     }
-
 
 //    override fun update(e: AnActionEvent) {
 //        val dataContext = e.dataContext
