@@ -1,6 +1,5 @@
 package io.github.t45k.bitbucket_coverage
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.intellij.coverage.CoverageDataManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -12,23 +11,10 @@ import com.intellij.rt.coverage.data.LineData
 import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
 import io.github.t45k.bitbucket_coverage.model.FileCoverage
-import io.github.t45k.bitbucket_coverage.model.Inner
 import io.github.t45k.bitbucket_coverage.model.IntermediateFileCoverage
-import io.github.t45k.bitbucket_coverage.model.RequestBody
 import kotlin.io.path.Path
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpRequest.BodyPublishers
-import java.net.http.HttpResponse.BodyHandlers
-import java.nio.charset.StandardCharsets
-import java.util.Base64
-import java.util.StringJoiner
 
 class CoveragePostAction : AnAction() {
-
-    private val httpClient = HttpClient.newHttpClient();
-    private val objectMapper = jacksonObjectMapper()
 
     companion object {
         private val logger = Logger.getInstance(this::class.java)
@@ -76,28 +62,11 @@ class CoveragePostAction : AnAction() {
                     return@runReadAction // TODO: show message
                 }
 
+                val bitbucketServerApiClient = BitbucketServerApiClient(BITBUCKET_URL, USERNAME, PASSWORD)
                 for ((repo, fileCoverages) in repositoryFileCoverageMap) {
-                    val uri = URI.create("$BITBUCKET_URL/rest/code-coverage/1.0/commits/${repo.currentRevision!!}")
-                    val body = fileCoverages.filter { it.lines.isNotEmpty() }
-                        .map { fileCoverage ->
-                            val coveredLines = fileCoverage.lines.groupBy({ it.hits > 0 }, { it.lineNumber })
-                            val joiner = StringJoiner(";")
-                            coveredLines[true]?.also { joiner.add("C:${it.joinToString(",")}") }
-                            coveredLines[false]?.also { joiner.add("U:${it.joinToString(",")}") }
-                            Inner(fileCoverage.relativePath, joiner.toString())
-                        }.let(::RequestBody)
-                    val request = HttpRequest.newBuilder()
-                        .uri(uri)
-                        .header(
-                            "authorization",
-                            "Basic ${Base64.getEncoder().encodeToString("$USERNAME:$PASSWORD".toByteArray())}"
-                        ).header("X-Atlassian-Token", "no-check")
-                        .header("content-type", "application/json")
-                        .POST(BodyPublishers.ofString(objectMapper.writeValueAsString(body)))
-                        .build()
-                    val response = httpClient.send(request, BodyHandlers.ofString(StandardCharsets.UTF_8))
-                    if (response.statusCode() >= 400) {
-                        logger.error(response.body())
+                    when (val result = bitbucketServerApiClient.postCoverage(repo, fileCoverages)) {
+                        CoverageApiResult.Success -> logger.info("Succeeded to post coverage data") // TODO: show successful dialog
+                        is CoverageApiResult.Failure -> logger.error("Failed to post coverage data due to the following reason.\n${result.cause}")
                     }
                     // TODO: show dialog
                 }
