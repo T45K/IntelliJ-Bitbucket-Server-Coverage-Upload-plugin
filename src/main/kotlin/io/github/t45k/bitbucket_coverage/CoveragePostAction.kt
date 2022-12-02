@@ -6,8 +6,8 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.psi.JavaPsiFacade
-import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.PsiManager
+import com.intellij.psi.util.ClassUtil
 import com.intellij.rt.coverage.data.LineData
 import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
@@ -48,19 +48,24 @@ class CoveragePostAction : AnAction() {
                     currentSuite.suites[0].getCoverageData(coverageDataManager)
                         ?: return@runReadAction // TODO: show message
                 val classes = projectData.classesCollection
-                val scope = GlobalSearchScope.everythingScope(project)
-                val javaPsiFacade = JavaPsiFacade.getInstance(project)
-                val repositoryFileCoverageMap: Map<GitRepository, List<FileCoverage>> =
-                    classes.mapNotNull { classDate ->
-                        val psiFile =
-                            javaPsiFacade.findClass(classDate.name, scope)?.containingFile ?: return@mapNotNull null
+                val psiManager = PsiManager.getInstance(project)
+                val repositoryFileCoverageMap: Map<GitRepository, List<FileCoverage>> = classes.asSequence()
+                    .mapNotNull { classData ->
+                        val psiFile = ClassUtil.findPsiClass(psiManager, classData.name)?.containingFile
+                            ?: return@mapNotNull null
                         if (psiFile.fileType.isBinary) {
                             return@mapNotNull null
                         }
-                        val lines = classDate.lines.filterNotNull().map { it as LineData }
+                        val lines = classData.lines.filterNotNull().map { it as LineData }
                         IntermediateFileCoverage(psiFile.virtualFile, lines)
-                    }.mapNotNull {
-                        val repository = gitRepositoryManager.getRepositoryForFile(it.file) ?: return@mapNotNull null
+                    }
+                    .groupBy { it.file }
+                    .map { (virtualFile, list) ->
+                        IntermediateFileCoverage(virtualFile, list.map { it.lines }.flatten())
+                    }
+                    .mapNotNull {
+                        val repository =
+                            gitRepositoryManager.getRepositoryForFile(it.file) ?: return@mapNotNull null
                         repository to it
                     }.groupBy({ it.first }, {
                         val repoRoot = Path(it.first.root.path).toRealPath()
