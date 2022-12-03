@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("groovy")
     id("org.jetbrains.kotlin.jvm") version "1.6.20"
     id("org.jetbrains.intellij") version "1.9.0"
 }
@@ -18,6 +19,19 @@ intellij {
     type.set("IC") // Target IDE Platform
 
     plugins.set(listOf("com.intellij.java", "git4idea"))
+}
+
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.9.0")
+
+    testImplementation(platform("org.apache.groovy:groovy-bom:4.0.6"))
+    testImplementation("org.apache.groovy:groovy")
+    testImplementation(platform("org.spockframework:spock-bom:2.3-groovy-4.0"))
+    testImplementation("org.spockframework:spock-core")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
 }
 
 tasks {
@@ -44,4 +58,8 @@ tasks {
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
+}
+
+val test by tasks.getting(Test::class) {
+    useJUnitPlatform()
 }
