@@ -61,5 +61,3 @@ sealed interface CoverageApiResult {
     object Success : CoverageApiResult
     data class Failure(val cause: String) : CoverageApiResult
 }
-
-
