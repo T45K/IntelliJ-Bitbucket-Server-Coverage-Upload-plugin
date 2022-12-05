@@ -26,9 +26,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationConfigurable
                 parentId="tools"
-                instance="io.github.t45k.bitbucket_coverage.config.PluginConfiguration"
-                id="io.github.t45k.bitbucket_coverage.config.PluginConfiguration"
-                displayName="Posting coverage to Bitbucket Server"/>
+                instance="io.github.t45k.bitbucket_coverage.config.PluginSettingsConfiguration"
+                id="io.github.t45k.bitbucket_coverage.config.PluginSettingsConfiguration"
+                displayName="Coverage Upload"/>
+        <applicationService serviceImplementation="io.github.t45k.bitbucket_coverage.config.PluginSettingsState"/>
     </extensions>
 
     <actions>
