@@ -1,14 +1,14 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
-    <id>io.github.t45k.bitbucket-coverage-sending-plugin</id>
+    <id>io.github.t45k.bitbucket_coverage</id>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
-    <name>Bitbucket Server Coverage API Call Extension</name>
+    <name>Coverage Uploader for Bitbucket Server</name>
 
     <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor email="tasktas9@gmail.com" url="https://t45k.github.io">T45K</vendor>
+    <vendor email="tasktas9@gmail.com" url="https://t45k.github.io">Tasuku Nakagawa</vendor>
 
     <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
          Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
@@ -28,13 +28,13 @@
                 parentId="tools"
                 instance="io.github.t45k.bitbucket_coverage.config.PluginSettingsConfiguration"
                 id="io.github.t45k.bitbucket_coverage.config.PluginSettingsConfiguration"
-                displayName="Coverage Upload"/>
+                displayName="Coverage Uploader"/>
         <applicationService serviceImplementation="io.github.t45k.bitbucket_coverage.config.PluginSettingsState"/>
     </extensions>
 
     <actions>
         <action class="io.github.t45k.bitbucket_coverage.CoverageUploadAction"
-                text="Post Coverage Result to Bitbucket Server">
+                text="Upload Coverage to Bitbucket Server">
             <add-to-group group-id="RunContextGroupMore"/>
         </action>
     </actions>
