@@ -15,7 +15,7 @@ import io.github.t45k.bitbucket_coverage.model.FileCoverage
 import io.github.t45k.bitbucket_coverage.model.IntermediateFileCoverage
 import io.github.t45k.bitbucket_coverage.model.mergeLines
 
-class CoveragePostAction : AnAction() {
+class CoverageUploadAction : AnAction() {
 
     companion object {
         private val logger = Logger.getInstance(this::class.java)
