@@ -63,18 +63,4 @@ class CoverageUploadAction : AnAction() {
             }
         }
     }
-
-//    override fun update(e: AnActionEvent) {
-//        val dataContext = e.dataContext
-//        val presentation = e.presentation
-//        presentation.isEnabled = false
-//        presentation.isVisible = false
-//        val project = e.project ?: return
-//        val currentSuite = CoverageDataManager.getInstance(project).currentSuitesBundle ?: return
-//        val coverageEngine = currentSuite.coverageEngine
-//        if (coverageEngine.isReportGenerationAvailable(project, dataContext, currentSuite)) {
-//            presentation.isEnabled = true
-//            presentation.isVisible = true
-//        }
-//    }
 }
