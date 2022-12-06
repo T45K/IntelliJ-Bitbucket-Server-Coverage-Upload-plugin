@@ -47,8 +47,8 @@ class BitbucketServerApiClient(
         return try {
             val response = httpClient.send(request, BodyHandlers.ofString())
             if (response.statusCode() < 400) CoverageApiResult.Success else CoverageApiResult.Failure(response.body())
-        } catch (e: HttpTimeoutException) {
-            CoverageApiResult.Failure(e.message!!)
+        } catch (e: Exception) {
+            CoverageApiResult.Failure(e.message ?: e.stackTraceToString())
         }
     }
 }
