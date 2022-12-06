@@ -30,6 +30,7 @@
                 id="io.github.t45k.bitbucket_coverage.config.PluginSettingsConfiguration"
                 displayName="Coverage Uploader"/>
         <applicationService serviceImplementation="io.github.t45k.bitbucket_coverage.config.PluginSettingsState"/>
+        <notificationGroup displayType="TOOL_WINDOW" id="Coverage Uploader message"/>
     </extensions>
 
     <actions>
