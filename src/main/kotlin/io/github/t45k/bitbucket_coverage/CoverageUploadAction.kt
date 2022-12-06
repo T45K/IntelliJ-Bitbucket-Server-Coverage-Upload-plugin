@@ -9,17 +9,16 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.ClassUtil
 import git4idea.repo.GitRepository
 import git4idea.repo.GitRepositoryManager
+import io.github.t45k.bitbucket_coverage.config.PluginSettingsState
+import io.github.t45k.bitbucket_coverage.credential.retrievePasswordInSafeWay
 import io.github.t45k.bitbucket_coverage.model.FileCoverage
 import io.github.t45k.bitbucket_coverage.model.IntermediateFileCoverage
 import io.github.t45k.bitbucket_coverage.model.mergeLines
 
-class CoveragePostAction : AnAction() {
+class CoverageUploadAction : AnAction() {
 
     companion object {
         private val logger = Logger.getInstance(this::class.java)
-        private const val BITBUCKET_URL = "https://foo"
-        private const val USERNAME = "bar"
-        private const val PASSWORD = "baz"
     }
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -51,7 +50,9 @@ class CoveragePostAction : AnAction() {
                     .takeIf { it.isNotEmpty() }
                     ?: return@runReadAction
 
-                val bitbucketServerApiClient = BitbucketServerApiClient(BITBUCKET_URL, USERNAME, PASSWORD)
+                val (bitbucketServerUrl, username) = PluginSettingsState.getInstance()
+                val password = retrievePasswordInSafeWay(username)
+                val bitbucketServerApiClient = BitbucketServerApiClient(bitbucketServerUrl, username, password)
                 for ((repo, fileCoverages) in repositoryFileCoverageMap) {
                     when (val result = bitbucketServerApiClient.postCoverage(repo, fileCoverages)) {
                         CoverageApiResult.Success -> logger.info("Succeeded to post coverage data") // TODO: show successful dialog
@@ -62,18 +63,4 @@ class CoveragePostAction : AnAction() {
             }
         }
     }
-
-//    override fun update(e: AnActionEvent) {
-//        val dataContext = e.dataContext
-//        val presentation = e.presentation
-//        presentation.isEnabled = false
-//        presentation.isVisible = false
-//        val project = e.project ?: return
-//        val currentSuite = CoverageDataManager.getInstance(project).currentSuitesBundle ?: return
-//        val coverageEngine = currentSuite.coverageEngine
-//        if (coverageEngine.isReportGenerationAvailable(project, dataContext, currentSuite)) {
-//            presentation.isEnabled = true
-//            presentation.isVisible = true
-//        }
-//    }
 }

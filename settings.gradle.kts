@@ -1,1 +1,1 @@
-rootProject.name = "bitbucket-coverage-posting-plugin"
+rootProject.name = "coverage-uploader"
