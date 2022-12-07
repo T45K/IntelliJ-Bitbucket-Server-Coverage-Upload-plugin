@@ -38,9 +38,9 @@ class CoverageUploadAction : AnAction() {
                         return@runReadAction
                     }
 
-                val classes = projectData.classesCollection
 
-                val repositoryFileCoverageMap: Map<GitRepository, List<FileCoverage>> = classes.asSequence()
+                val repositoryFileCoverageMap: Map<GitRepository, List<FileCoverage>> = projectData.classes.values
+                    .asSequence()
                     .mapNotNull { classData ->
                         IntermediateFileCoverage.fromClassData(classData) { ClassUtil.findPsiClass(psiManager, it) }
                     }

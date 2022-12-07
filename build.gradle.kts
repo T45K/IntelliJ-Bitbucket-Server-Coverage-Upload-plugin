@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.t45k"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -45,7 +45,7 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("213")
+        sinceBuild.set("221")
         untilBuild.set("223.*")
     }
 
