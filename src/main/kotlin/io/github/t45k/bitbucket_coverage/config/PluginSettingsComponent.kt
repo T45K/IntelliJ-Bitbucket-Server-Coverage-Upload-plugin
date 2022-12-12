@@ -17,15 +17,14 @@ class PluginSettingsComponent {
     var usernameText: String = ""
 
     init {
-        val passwordTextField = JPasswordField()
         panel = panel {
-            row("Bitbucket Server URL: ") { textField().bindText(::bitbucketServerUrlText) } // TODO: Validation
+            row("Bitbucket Server URL: ") { textField().bindText(::bitbucketServerUrlText) }
             row("Username: ") { textField().bindText(::usernameText) }
             row("Password: ") {
-                cell(passwordTextField).columns(COLUMNS_SHORT).bindText(
+                cell(JPasswordField()).columns(COLUMNS_SHORT).bindText(
                     { retrievePasswordInSafeWay(usernameText) },
                     { storePasswordInSafeWay(usernameText, it) }
-                )
+                ).comment("You can use personal access token instead of password.")
             }
         }
     }

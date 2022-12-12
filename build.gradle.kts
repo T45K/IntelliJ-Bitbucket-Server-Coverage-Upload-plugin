@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.t45k"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     mavenCentral()

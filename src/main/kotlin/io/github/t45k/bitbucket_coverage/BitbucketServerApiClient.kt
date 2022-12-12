@@ -7,7 +7,6 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse.BodyHandlers
-import java.net.http.HttpTimeoutException
 import java.time.Duration
 import java.util.Base64
 import java.util.StringJoiner
@@ -24,7 +23,7 @@ class BitbucketServerApiClient(
     fun postCoverage(repo: GitRepository, fileCoverages: List<FileCoverage>): CoverageApiResult {
         val head: String = repo.currentRevision
             ?: return CoverageApiResult.Failure("Failed to find head commit. This module may not be git repository.")
-        val uri = URI.create("$bitbucketServerUrl/rest/code-coverage/1.0/commits/$head")
+        val uri = URI.create("$bitbucketServerUrl/rest/code-coverage/1.0/commits/$head").normalize()
         val requestBody: CoverageApiRequestBody = fileCoverages.filter { it.lines.isNotEmpty() }
             .map { fileCoverage ->
                 val coveredLines: List<Int> = fileCoverage.getCoveredLines()
