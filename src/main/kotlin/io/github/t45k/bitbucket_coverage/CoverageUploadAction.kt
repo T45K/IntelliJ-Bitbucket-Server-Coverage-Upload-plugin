@@ -38,7 +38,6 @@ class CoverageUploadAction : AnAction() {
                         return@runReadAction
                     }
 
-
                 val repositoryFileCoverageMap: Map<GitRepository, List<FileCoverage>> = projectData.classes.values
                     .asSequence()
                     .mapNotNull { classData ->
