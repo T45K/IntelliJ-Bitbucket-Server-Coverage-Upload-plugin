@@ -1,8 +1,8 @@
 plugins {
     id("java")
     id("groovy")
-    id("org.jetbrains.kotlin.jvm") version "1.6.20"
-    id("org.jetbrains.intellij") version "1.9.0"
+    id("org.jetbrains.kotlin.jvm") version "1.9.23"
+    id("org.jetbrains.intellij") version "1.17.2"
 }
 
 group = "io.github.t45k"
@@ -22,16 +22,16 @@ intellij {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.9.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.9.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.2")
 
-    testImplementation(platform("org.apache.groovy:groovy-bom:4.0.6"))
+    testImplementation(platform("org.apache.groovy:groovy-bom:4.0.20"))
     testImplementation("org.apache.groovy:groovy")
     testImplementation(platform("org.spockframework:spock-bom:2.3-groovy-4.0"))
     testImplementation("org.spockframework:spock-core")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:5.0.0-alpha.12")
 }
 
 tasks {

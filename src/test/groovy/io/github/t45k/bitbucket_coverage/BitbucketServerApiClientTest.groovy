@@ -4,8 +4,8 @@ import com.intellij.rt.coverage.data.LineData
 import git4idea.repo.GitRepository
 import groovy.json.JsonSlurper
 import io.github.t45k.bitbucket_coverage.model.FileCoverage
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
+import mockwebserver3.MockResponse
+import mockwebserver3.MockWebServer
 import spock.lang.Specification
 
 class BitbucketServerApiClientTest extends Specification {
