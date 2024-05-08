@@ -18,7 +18,7 @@ class BitbucketServerApiClientTest extends Specification {
         def url = mockWebServer.url('').toString()
         def bitbucketServerApiClient = new BitbucketServerApiClient(url, 'user', 'pass')
 
-        mockWebServer.enqueue(new MockResponse().setResponseCode(200))
+        mockWebServer.enqueue(new MockResponse().newBuilder().code(200).build())
 
         def gitRepository = Stub(GitRepository) { getCurrentRevision() >> '0123456789' }
         def fileCoverages = [
@@ -66,7 +66,7 @@ class BitbucketServerApiClientTest extends Specification {
     def 'postCoverage returns Failure when API call is failure'() {
         given:
         def url = mockWebServer.url('').toString()
-        mockWebServer.enqueue(new MockResponse().setResponseCode(responseCode).setBody("{\"message\": \"$message\"}"))
+        mockWebServer.enqueue(new MockResponse().newBuilder().code(responseCode).body("{\"message\": \"$message\"}").build())
         def bitbucketServerApiClient = new BitbucketServerApiClient(url, 'user', 'pass')
 
         def gitRepository = Stub(GitRepository) { getCurrentRevision() >> '0123456789' }
