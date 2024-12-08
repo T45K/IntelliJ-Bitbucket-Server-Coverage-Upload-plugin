@@ -1,27 +1,57 @@
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+
 plugins {
     id("java")
     id("groovy")
     id("org.jetbrains.kotlin.jvm") version "1.9.23"
-    id("org.jetbrains.intellij") version "1.17.2"
+    id("org.jetbrains.intellij.platform") version "2.2.0"
 }
 
 group = "io.github.t45k"
-version = "1.0.4"
+version = "1.0.5"
 
 repositories {
     mavenCentral()
+
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2023.1")
-    type.set("IC") // Target IDE Platform
+intellijPlatform {
+    pluginConfiguration {
+        version.set(project.version.toString())
 
-    plugins.set(listOf("com.intellij.java", "Git4Idea"))
+        ideaVersion {
+            sinceBuild.set("242")
+            untilBuild.set("243.*")
+        }
+    }
+
+    signing {
+        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
+        privateKey.set(System.getenv("PRIVATE_KEY"))
+        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+    }
+
+    publishing {
+        token.set(System.getenv("PUBLISH_TOKEN"))
+    }
 }
 
 dependencies {
+    intellijPlatform {
+        intellijIdeaCommunity("2024.3") // Target IDE Platform
+
+        bundledPlugins(listOf("Git4Idea", "com.intellij.java"))
+
+        pluginVerifier()
+        zipSigner()
+        testFramework(TestFrameworkType.Platform)
+    }
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
@@ -42,21 +72,6 @@ tasks {
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions.jvmTarget = "17"
-    }
-
-    patchPluginXml {
-        sinceBuild.set("231")
-        untilBuild.set("241.*")
-    }
-
-    signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
-
-    publishPlugin {
-        token.set(System.getenv("PUBLISH_TOKEN"))
     }
 }
 
