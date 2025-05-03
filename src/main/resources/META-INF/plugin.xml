@@ -42,4 +42,5 @@
 
     <depends>com.intellij.modules.java</depends>
     <depends>Git4Idea</depends>
+    <depends>Coverage</depends>
 </idea-plugin>
