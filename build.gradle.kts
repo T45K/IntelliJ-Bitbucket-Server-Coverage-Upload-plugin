@@ -3,12 +3,12 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 plugins {
     id("java")
     id("groovy")
-    id("org.jetbrains.kotlin.jvm") version "1.9.23"
-    id("org.jetbrains.intellij.platform") version "2.2.0"
+    id("org.jetbrains.kotlin.jvm") version "2.1.20"
+    id("org.jetbrains.intellij.platform") version "2.5.0"
 }
 
 group = "io.github.t45k"
-version = "1.0.5"
+version = "1.0.6"
 
 repositories {
     mavenCentral()
@@ -26,7 +26,7 @@ intellijPlatform {
 
         ideaVersion {
             sinceBuild.set("242")
-            untilBuild.set("243.*")
+            untilBuild.set("251.*")
         }
     }
 
@@ -43,7 +43,7 @@ intellijPlatform {
 
 dependencies {
     intellijPlatform {
-        intellijIdeaCommunity("2024.3") // Target IDE Platform
+        intellijIdeaCommunity("2025.1") // Target IDE Platform
 
         bundledPlugins(listOf("Git4Idea", "com.intellij.java"))
 
@@ -67,11 +67,11 @@ dependencies {
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = "21"
     }
 }
 
