@@ -24,7 +24,7 @@ class BitbucketServerApiClient(
         val head: String = repo.currentRevision
             ?: return CoverageApiResult.Failure("Failed to find head commit. This module may not be git repository.")
         val uri = URI.create("$bitbucketServerUrl/rest/code-coverage/1.0/commits/$head").normalize()
-        val requestBody: CoverageApiRequestBody = fileCoverages.filter { it.lines.isNotEmpty() }
+        val requestBody: CoverageApiRequestBody = fileCoverages.filter { !it.lines.isEmpty() }
             .map { fileCoverage ->
                 val coveredLines: List<Int> = fileCoverage.getCoveredLines()
                 val uncoveredLines: List<Int> = fileCoverage.getUncoveredLines()

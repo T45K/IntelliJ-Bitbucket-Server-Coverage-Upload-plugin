@@ -4,8 +4,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     id("java")
     id("groovy")
-    id("org.jetbrains.kotlin.jvm") version "2.1.20"
     id("org.jetbrains.intellij.platform") version "2.5.0"
+
+    kotlin("jvm") version "2.1.20"
 }
 
 group = "io.github.t45k"
@@ -46,7 +47,7 @@ dependencies {
     intellijPlatform {
         intellijIdeaCommunity("2025.1") // Target IDE Platform
 
-        bundledPlugins(listOf("Git4Idea", "com.intellij.java"))
+        bundledPlugins(listOf("Git4Idea", "com.intellij.java", "Coverage"))
 
         pluginVerifier()
         zipSigner()
